@@ -1,0 +1,249 @@
+/* scanner.css - Solución simplificada y funcional */
+:root {
+  --primary: #f9d71c; /* Amarillo principal */
+  --secondary: #4a90e2; /* Azul vibrante */
+  --accent: #ff6b6b; /* Rojo coral */
+  --dark: #0a0a0a; /* Fondo oscuro principal */
+  --light: #e8e8e8; /* Texto claro */
+  --border-radius: 8px;
+  --transition: all 0.3s ease;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
+  background: var(--dark);
+  color: var(--light);
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+/* Contenedor principal que cubre toda la pantalla con agujero central */
+.camera-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--dark);
+  z-index: 1;
+  /* Crear un agujero rectangular en el centro */
+  clip-path: polygon(
+    0% 0%,
+    0% 100%,
+    calc(50% - 45vh) 100%,
+    calc(50% - 45vh) calc(50% - 45vh),
+    calc(50% + 45vh) calc(50% - 45vh),
+    calc(50% + 45vh) calc(50% + 45vh),
+    calc(50% - 45vh) calc(50% + 45vh),
+    calc(50% - 45vh) 100%,
+    100% 100%,
+    100% 0%
+  );
+}
+
+/* Recuadro amarillo alrededor del área visible */
+.camera-frame {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vh;
+  height: 90vh;
+  max-width: 95vw;
+  max-height: 95vw;
+  border: 3px solid var(--primary);
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(249, 215, 28, 0.3);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Escena AR - ocupa toda la pantalla pero se ve solo a través del agujero */
+a-scene {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 0;
+}
+
+/* Botones de arriba */
+.top-buttons {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+  background: rgba(10, 10, 10, 0.9);
+  padding: 10px 15px;
+  border-radius: 25px;
+  border: 2px solid var(--primary);
+  backdrop-filter: blur(5px);
+}
+
+.action-btn {
+  background: rgba(249, 215, 28, 0.1);
+  color: var(--light);
+  border: 1px solid var(--primary);
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: 600;
+}
+
+.action-btn:hover {
+  background: var(--primary);
+  color: var(--dark);
+  transform: scale(1.05);
+}
+
+/* Botones abajo */
+.bottom-buttons {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  gap: 15px;
+  background: rgba(10, 10, 10, 0.9);
+  padding: 10px 20px;
+  border-radius: 25px;
+  border: 2px solid var(--primary);
+  backdrop-filter: blur(5px);
+}
+
+.help-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  color: var(--dark);
+  font-weight: bold;
+  font-size: 1.2rem;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.help-btn:hover {
+  background: #e6c200;
+  transform: scale(1.1);
+}
+
+.restart-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  font-size: 1.2rem;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.restart-btn:hover {
+  background: #ff5252;
+  transform: scale(1.1);
+}
+
+/* Posicionamiento de grupos de botones */
+#ar-ui {
+  top: 20px;
+}
+
+#filter-ui {
+  top: 80px;
+}
+
+#anim-ui {
+  top: 80px;
+}
+
+/* Efectos para objetivo detectado */
+.target-found .camera-frame {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { 
+    box-shadow: 0 0 0 3px var(--primary), 0 0 20px rgba(249, 215, 28, 0.3);
+  }
+  50% { 
+    box-shadow: 0 0 0 5px var(--primary), 0 0 30px rgba(249, 215, 28, 0.5);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .camera-frame {
+    width: 95vw;
+    height: 95vw;
+  }
+  
+  .camera-mask {
+    clip-path: polygon(
+      0% 0%,
+      0% 100%,
+      calc(50% - 47.5vw) 100%,
+      calc(50% - 47.5vw) calc(50% - 47.5vw),
+      calc(50% + 47.5vw) calc(50% - 47.5vw),
+      calc(50% + 47.5vw) calc(50% + 47.5vw),
+      calc(50% - 47.5vw) calc(50% + 47.5vw),
+      calc(50% - 47.5vw) 100%,
+      100% 100%,
+      100% 0%
+    );
+  }
+  
+  .top-buttons {
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 90vw;
+  }
+  
+  .action-btn {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+}
+
+/* Loading */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--dark);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(249, 215, 28, 0.3);
+  border-top: 3px solid var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

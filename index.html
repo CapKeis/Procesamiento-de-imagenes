@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Escaner AR Landing</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <div class="header">
+    <div class="logo">ESCÁNER COPA MUNDIAL 2026</div>
+    <div class="subtitle">Canadá • Estados Unidos • México</div>
+    <a href="ManualUsuario.pdf" target="_blank" class="help-btn-index">?</a>
+  </div>
+
+  <div class="main-content">
+    <div class="ar-section">
+      <div class="ar-title">Escanea las banderas de tus paises favoritos</div>
+      <div class="button-container">
+        <button class="ar-button" onclick="window.location.href='scanner.html'">Ir a Escáner AR</button>
+      </div>
+    </div>
+
+    <div>
+      <h2 class="section-title">Estadísticas de Equipos</h2>
+      <p>Selecciona un país para ver su resumen histórico en Copas del Mundo.</p>
+
+      <div class="host-countries" id="countries-list">
+        <!-- Cards generadas por JS -->
+      </div>
+
+      <div id="stats-panel" class="stats-panel">
+        <h3 id="stats-title" class="stats-title"></h3>
+        <p id="stats-text"></p>
+      </div>
+    </div>
+
+    <div class="trivia" id="trivia">
+      <div class="trivia-header">
+        <h2 class="section-title">Trivia del Mundial</h2>
+        <button onclick="generateFive()" class="regen-btn">Nuevas Preguntas</button>
+      </div>
+      <p>Pon a prueba tus conocimientos sobre la Copa del Mundo. Se eligen 5 preguntas al azar cada vez.</p>
+      <div id="trivia-container" class="trivia-container"></div>
+    </div>
+  </div>
+
+  <script>
+  /**********************
+    Datos y comportamiento
+  ***********************/
+
+  // 1) Estadísticas por país (13)
+  const countriesStats = {
+    "ARG": { name:"Argentina", text:"Argentina ha participado en 18 Copas del Mundo, con 3 títulos (1978, 1986, 2022). Destacan Maradona y Messi." },
+    "AUS": { name:"Australia", text:"Australia ha clasificado 6 veces. Debutó en 1974; su mejor resultado fue octavos en 2006 (Socceroos)." },
+    "BRA": { name:"Brasil", text:"Brasil: 5 títulos (1958,1962,1970,1994,2002). Es la selección con más campeonatos." },
+    "CAN": { name:"Canadá", text:"Canadá jugó fases finales en 1986 y 2022; su fútbol está en crecimiento en CONCACAF." },
+    "COR": { name:"Corea del Sur", text:"Corea del Sur ha estado en múltiples ediciones; su hito fue el 4.º lugar en 2002 (coorganizado con Japón)." },
+    "ECU": { name:"Ecuador", text:"Ecuador ha estado en 4 Mundiales (2002,2006,2014,2022); apodados 'La Tricolor'." },
+    "EU": { name:"Estados Unidos", text:"EE. UU. ha jugado 11 mundiales. Host en 1994; importante crecimiento del soccer doméstico." },
+    "IRN": { name:"Irán", text:"Irán (Team Melli) ha clasificado varias veces y es de las selecciones más consistentes de Asia." },
+    "JPN": { name:"Japón", text:"Japón (Samurai Blue) debutó en 1998 y es habitual en fases finales." },
+    "JRD": { name:"Jordania", text:"Jordania desarrolla su fútbol y se muestra competitivo a nivel asiático." },
+    "MEX": { name:"México", text:"México ha jugado 17 mundiales; es potencia en CONCACAF con una afición muy apasionada." },
+    "NZL": { name:"Nueva Zelanda", text:"Nueva Zelanda clasificó en 1982 y 2010; en 2010 fue invicta en fase de grupos (3 empates)." },
+    "UZB": { name:"Uzbekistán", text:"Uzbekistán es fuerte en Asia, aunque históricamente no había clasificado a mundiales hasta fechas recientes." }
+  };
+
+  // Generar el listado de países (cards)
+  const countriesListEl = document.getElementById('countries-list');
+  Object.keys(countriesStats).forEach(code => {
+    const c = countriesStats[code];
+    const card = document.createElement('div');
+    card.className = 'country';
+    card.innerHTML = `
+      <div class="country-flag">${c.name}</div>
+      <div>
+        <button onclick="showStats('${code}')" class="stats-btn">Ver Estadísticas</button>
+      </div>
+    `;
+    countriesListEl.appendChild(card);
+  });
+
+  function showStats(code){
+    const p = countriesStats[code];
+    document.getElementById('stats-title').innerText = p.name;
+    document.getElementById('stats-text').innerText = p.text;
+    document.getElementById('stats-panel').style.display = 'block';
+    // opcional: hace scroll hasta el panel
+    document.getElementById('stats-panel').scrollIntoView({behavior:'smooth'});
+  }
+
+  // 2) TRIVIA: pool de 13 preguntas (puedes editar/añadir aquí)
+  const triviaPool = [
+    { q:"¿En qué año Argentina ganó su primera Copa del Mundo?", opts:["1978","1986","2022"], a:"1978" },
+    { q:"¿Cuántos títulos mundiales ha ganado Brasil?", opts:["3","5","6"], a:"5" },
+    { q:"¿Quién fue el entrenador de Corea del Sur en 2002 que los llevó al histórico 4° lugar?", opts:["Guus Hiddink","Dick Advocaat","Hong Myung-bo"], a:"Guus Hiddink" },
+    { q:"¿En qué Mundial Ecuador consiguió su primera victoria?", opts:["2002","2006","2014"], a:"2002" },
+    { q:"¿En qué año organizó Estados Unidos la Copa del Mundo?", opts:["1994","2002","2010"], a:"1994" },
+    { q:"¿En qué año fue el primer campeón del mundo (Uruguay)?", opts:["1928","1930","1948"], a:"1930" },
+    { q:"¿Cuál selección terminó invicta en fase de grupos en 2010?", opts:["Nueva Zelanda","España","Uruguay"], a:"Nueva Zelanda" },
+    { q:"¿Cuántas veces ha participado México en Mundiales (aprox.)?", opts:["15","17","20"], a:"17" },
+    { q:"¿Qué selección es conocida como 'Team Melli'?", opts:["Irán","Japón","Corea"], a:"Irán" },
+    { q:"¿Cuál es el apodo de la selección de Japón?", opts:["Samurai Blue","Socceroos","La Celeste"], a:"Samurai Blue" },
+    { q:"¿Cuál es el apodo de Australia?", opts:["Socceroos","All Whites","La Tricolor"], a:"Socceroos" },
+    { q:"¿Qué selección sudamericana es apodada 'La Tricolor' en este proyecto?", opts:["Ecuador","Colombia","Paraguay"], a:"Ecuador" },
+    { q:"¿Qué país tiene el récord de más títulos mundiales?", opts:["Brasil","Alemania","Italia"], a:"Brasil" }
+  ];
+
+  // Obtiene N preguntas aleatorias sin repetir
+  function pickNrandom(arr, n){
+    const copy = arr.slice();
+    const out = [];
+    for(let i=0; i<n && copy.length>0; i++){
+      const idx = Math.floor(Math.random()*copy.length);
+      out.push(copy.splice(idx,1)[0]);
+    }
+    return out;
+  }
+
+  // Renderizar las 5 preguntas
+  function renderTrivia(questions){
+    const container = document.getElementById('trivia-container');
+    container.innerHTML = '';
+    questions.forEach((qq, i) => {
+      const qEl = document.createElement('div');
+      qEl.className = 'question';
+      qEl.innerHTML = `
+        <div class="question-text">${qq.q}</div>
+        <div class="options-container" id="opts-${i}"></div>
+        <div id="fb-${i}" class="feedback"></div>
+      `;
+      container.appendChild(qEl);
+
+      const optsEl = qEl.querySelector(`#opts-${i}`);
+      qq.opts.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = opt;
+        btn.onclick = () => {
+          const fb = qEl.querySelector(`#fb-${i}`);
+          const isCorrect = opt === qq.a;
+          
+          // Marcar la respuesta seleccionada
+          if (isCorrect) {
+            btn.classList.add('correct');
+            fb.innerText = '¡Correcto!';
+            fb.classList.add('correct');
+          } else {
+            btn.classList.add('incorrect');
+            fb.innerText = `Incorrecto. La respuesta correcta es: ${qq.a}`;
+            fb.classList.add('incorrect');
+            
+            // También marcar la respuesta correcta
+            Array.from(optsEl.children).forEach(b => {
+              if (b.innerText === qq.a) {
+                b.classList.add('correct');
+              }
+            });
+          }
+          
+          // Desactivar todos los botones después de responder
+          Array.from(optsEl.children).forEach(b => b.disabled = true);
+        };
+        optsEl.appendChild(btn);
+      });
+    });
+  }
+
+  // Genera 5 preguntas al azar y las muestra
+  function generateFive(){
+    const five = pickNrandom(triviaPool, 5);
+    renderTrivia(five);
+  }
+
+  // Ejecutar al cargar la página
+  window.addEventListener('load', ()=> {
+    generateFive();
+  });
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCANNER</title>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.5/dist/mindar-image.prod.js"></script>
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  <link rel="stylesheet" href="scanner.css">
+</head>
+<body>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- Máscara que tapa los bordes -->
+  <div class="camera-mask"></div>
+  
+  <!-- Recuadro amarillo -->
+  <div class="camera-frame"></div>
+
+  <!-- Escena AR completa -->
+  <a-scene
+    mindar-image="imageTargetSrc: targets.mind"
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false">
+    
+    <a-assets>
+    <video id="video-ARG" src="videos/VideoARG.mp4" loop crossorigin="anonymous"></video>
+    <video id="video-AUS" src="videos/VideoAUS.mp4" loop crossorigin="anonymous"></video>
+    <video id="video-BRA" src="videos/VideoBRA.mp4" loop crossorigin="anonymous"></video>
+    <video id="video-CAN" src="videos/VideoCAN.mp4" loop crossorigin="anonymous"></video>
+    <video id="video-COR" src="videos/VideoCOR.mp4" loop crossorigin="anonymous"></video>
+    <video id="video-ECU" src="videos/VideoECU.mp4" loop crossorigin="anonymous"></video>
+    <video id="video-EU" src="videos/VideoEU.mp4" loop crossorigin="anonymous"></video>
+    <video id="video-IRN" src="videos/VideoIRN.mp4" loop crossorigin="anonymous"></video>
+    <video id="video-JPN" src="videos/VideoJPN.mp4" loop crossorigin="anonymous"></video>
+    <video id="video-JRD" src="videos/VideoJRD.mp4" loop crossorigin="anonymous"></video>
+    <video id="video-MEX" src="videos/VideoMEX.mp4" loop crossorigin="anonymous"></video>
+    <video id="video-NZL" src="videos/VideoNZL.mp4" loop crossorigin="anonymous"></video>
+    <video id="video-UZB" src="videos/VideoUZB.mp4" loop crossorigin="anonymous"></video> 
+    </a-assets>
+
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+    <a-entity id="targets-container"></a-entity>
+  </a-scene>
+
+  <!-- Botones (mantener tu código actual) -->
+  <div id="ar-ui" class="top-buttons" style="display:none;">
+    <button class="action-btn" onclick="window.location.href='index.html#stats'">🔙 Regresar</button>
+    <button class="action-btn" onclick="showModel()">⚽ Animación</button>
+    <button class="action-btn" onclick="showVideo()">🎥 Video</button>
+  </div>
+
+  <div id="filter-ui" class="top-buttons" style="display:none;">
+    <button class="action-btn" onclick="applyFilter('grayscale')">🎨 B/N</button>
+    <button class="action-btn" onclick="applyFilter('sepia')">🎨 Sepia</button>
+    <button class="action-btn" onclick="applyFilter('invert')">🎨 Invertir</button>
+    <button class="action-btn" onclick="applyFilter('none')">❌ Quitar filtro</button>
+  </div>
+
+  <div id="anim-ui" class="top-buttons" style="display:none;">
+    <button id="anim-toggle-btn" class="action-btn" onclick="toggleAnimation()">▶ Iniciar Animación</button>
+  </div>
+
+  <div class="bottom-buttons">
+    <a href="ManualUsuario.pdf" target="_blank" class="help-btn">?</a>
+    <button class="restart-btn" onclick="restartScanner()">⟳</button>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const scene = document.querySelector('a-scene');
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      
+      if (scene.hasLoaded) {
+        loadingOverlay.style.display = 'none';
+      } else {
+        scene.addEventListener('loaded', function() {
+          loadingOverlay.style.display = 'none';
+        });
+      }
+    });
+  </script>
+</body>
+</html>
